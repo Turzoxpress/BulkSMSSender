@@ -1,6 +1,7 @@
 package com.brl.bulksmssender;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -9,6 +10,7 @@ import android.os.Environment;
 
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.PowerManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -16,6 +18,7 @@ import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -44,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView file_path,number_txt;
     private EditText main_message;
 
-    private LinearLayout button_panel,loading_panel;
+    private LinearLayout button_panel,loading_panel,panel3_msg;
     private TextView progress_text;
     private Button cancel;
 
@@ -59,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
     private boolean startHandler = false;
 
     private int iterator = 0;
+    private boolean keepSending = true;
 
 
 
@@ -73,6 +77,8 @@ public class MainActivity extends AppCompatActivity {
         number_txt = (TextView)findViewById(R.id.number_txt);
         main_message = (EditText)findViewById(R.id.main_message);
         send_button = (Button)findViewById(R.id.send_button);
+        panel3_msg = (LinearLayout)findViewById(R.id.panel3_msg);
+
 
         button_panel = (LinearLayout)findViewById(R.id.button_panel);
         loading_panel = (LinearLayout)findViewById(R.id.loadin_oanel);
@@ -83,7 +89,15 @@ public class MainActivity extends AppCompatActivity {
 
         send_button.setVisibility(View.INVISIBLE);
         main_message.setVisibility(View.INVISIBLE);
+        panel3_msg.setVisibility(View.INVISIBLE);
         showButtonPanel();
+
+        //--
+
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+
+        //--------
 
 
 
@@ -120,8 +134,14 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
+                keepSending = false;
                 handler.removeCallbacks(runner);
-                showButtonPanel();
+
+                Intent ni = new Intent(MainActivity.this,MainActivity.class);
+                startActivity(ni);
+                finish();
+
+                //showButtonPanel();
 
             }
         });
@@ -240,6 +260,7 @@ public class MainActivity extends AppCompatActivity {
         number_txt.setText(tempS);
         send_button.setVisibility(View.VISIBLE);
         main_message.setVisibility(View.VISIBLE);
+        panel3_msg.setVisibility(View.VISIBLE);
 
 
     }
@@ -295,40 +316,51 @@ public class MainActivity extends AppCompatActivity {
 
 
                 //--------
-                if(iterator >= nArray.size())
-                {
+                if(keepSending){
+
+                    if(iterator >= nArray.size())
+                    {
 
 
-                    showButtonPanel();
-                    allSMSSent();
-                    Log.d(TAG,"Runner is running----------");
+                        showButtonPanel();
+                        allSMSSent();
+                        Log.d(TAG,"Runner is running----------");
+                        handler.removeCallbacks(runner);
+
+
+
+
+
+
+                    }else{
+
+                        //--
+
+                        //SmsManager.getDefault().sendTextMessage(nArray.get(iterator), null, main_message.getText().toString(), null, null);
+
+                        SmsManager sms = SmsManager.getDefault();
+                        ArrayList<String> parts = sms.divideMessage(main_message.getText().toString());
+                        sms.sendMultipartTextMessage(nArray.get(iterator), null, parts, null, null);
+
+
+                        //-----------
+
+
+                        progress_text.setText("Sending SMS to "+nArray.get(iterator)+"  , Total sent("+String.valueOf(iterator)+"/"+nArray.size()+")");
+                        iterator++;
+
+                        handler.postDelayed(this, 3000);
+
+                    }
+
+
+
+                }else {
+
                     handler.removeCallbacks(runner);
-
-
-
-
-
-
-                }else{
-
-                    //--
-
-                    //SmsManager.getDefault().sendTextMessage(nArray.get(iterator), null, main_message.getText().toString(), null, null);
-
-                    SmsManager sms = SmsManager.getDefault();
-                    ArrayList<String> parts = sms.divideMessage(main_message.getText().toString());
-                    sms.sendMultipartTextMessage(nArray.get(iterator), null, parts, null, null);
-
-
-                    //-----------
-
-
-                    progress_text.setText("Sending SMS to "+nArray.get(iterator)+"  , Total sent("+String.valueOf(iterator)+"/"+nArray.size()+")");
-                    iterator++;
-
-                    handler.postDelayed(this, 3000);
-
+                    Log.d(TAG,"Cancel button was clicked!");
                 }
+
 
 
                 // task here

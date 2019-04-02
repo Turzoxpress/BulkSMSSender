@@ -92,7 +92,7 @@
                 </LinearLayout>
 
                 <LinearLayout
-                    android:id="@+id/panel3"
+                    android:id="@+id/panel3_msg"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="20dp"
