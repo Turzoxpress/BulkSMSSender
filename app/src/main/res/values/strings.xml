@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Bulk SMS Sender by BRL</string>
+
+    <string name="filePath">Find your file</string>
+</resources>
