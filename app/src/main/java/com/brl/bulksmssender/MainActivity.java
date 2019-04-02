@@ -311,7 +311,18 @@ public class MainActivity extends AppCompatActivity {
 
                 }else{
 
-                    SmsManager.getDefault().sendTextMessage(nArray.get(iterator), null, main_message.getText().toString(), null, null);
+                    //--
+
+                    //SmsManager.getDefault().sendTextMessage(nArray.get(iterator), null, main_message.getText().toString(), null, null);
+
+                    SmsManager sms = SmsManager.getDefault();
+                    ArrayList<String> parts = sms.divideMessage(main_message.getText().toString());
+                    sms.sendMultipartTextMessage(nArray.get(iterator), null, parts, null, null);
+
+
+                    //-----------
+
+
                     progress_text.setText("Sending SMS to "+nArray.get(iterator)+"  , Total sent("+String.valueOf(iterator)+"/"+nArray.size()+")");
                     iterator++;
 
@@ -367,6 +378,10 @@ public class MainActivity extends AppCompatActivity {
         alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
+
+                        Intent ni = new Intent(MainActivity.this,MainActivity.class);
+                        startActivity(ni);
+                        finish();
                         dialog.dismiss();
                     }
                 });
