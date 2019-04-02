@@ -13,4 +13,6 @@ Write your message, then press 'SEND SMS' button. The SMS will be sent one by on
 
 Minimup API version is : 18
 
+APK file link : https://github.com/Turzoxpress/BulkSMSSender/blob/master/Bulk_SMS_Sender.apk
+
 Thanks
